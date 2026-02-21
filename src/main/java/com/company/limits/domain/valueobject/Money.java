@@ -7,17 +7,23 @@ public final class Money {
     private final long amountInCents;
 
     public Money(long amountInCents) {
-        if (amountInCents <= 0 ) {
-            throw new IllegalArgumentException("Amount must be greater than zero");
-        }
+        validateMoney(amountInCents, false);
         this.amountInCents = amountInCents;
     }
 
     public Money(long amountInCents, boolean allowZero) {
+        validateMoney(amountInCents, allowZero);
+        this.amountInCents = amountInCents;
+    }
+
+    private void validateMoney(long amountInCents, boolean allowZero) {
         if (amountInCents < 0) {
             throw new IllegalArgumentException("Amount cannot be negative");
         }
-        this.amountInCents = amountInCents;
+
+        if (!allowZero && amountInCents == 0) {
+            throw new IllegalArgumentException("Amount must be greater than zero");
+        }
     }
 
     public long getAmountInCents() {
@@ -26,7 +32,8 @@ public final class Money {
 
     public Money add(Money other) {
         Objects.requireNonNull(other, "Money to add cannot be null");
-        return new Money(this.amountInCents + other.amountInCents);
+        long result = Math.addExact(this.amountInCents, other.amountInCents);
+        return new Money(result);
     }
 
     public boolean isGreaterThan(Money other) {
